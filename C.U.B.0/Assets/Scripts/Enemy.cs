@@ -1,93 +1,111 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    [Header("ENEMY PARAMETERS")]
-    [SerializeField] private float fireRate;
-    [SerializeField] private float bulletSpeed;
+	[Header("ENEMY PARAMETERS")]
+	[SerializeField]
+	private float fireRate;
 
-    [Header("COMPONENTS")]
-    [SerializeField] private GameObject cannon;
-    [SerializeField] private LineRenderer laser;
-    [SerializeField] private GameObject bullet;
-    [SerializeField] private GameObject deathFX;
+	[SerializeField]
+	private float bulletSpeed;
 
-    [Header("MESHES")]
-    [SerializeField] private GameObject redSphere;
-    [SerializeField] private GameObject body;
+	[Header("COMPONENTS")]
+	[SerializeField]
+	private GameObject cannon;
 
-    [Header("AUDIO")]
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip fireSound;
+	[SerializeField]
+	private GameObject cannonEnd;
 
+	[SerializeField]
+	private LineRenderer laser;
 
-    private bool dead, canFire;
-    private GameObject player;
-    private float timer;
+	[SerializeField]
+	private GameObject bullet;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        IniEnemy();
-    }
+	[SerializeField]
+	private GameObject deathFX;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if(!dead)
-        {
-            SightControl();
-            FireRateControl();
-        }
-    }
+	[SerializeField]
+	private Collider collider;
 
-    private void SightControl()
-    {
-        cannon.transform.LookAt(player.transform);
+	[Header("MESHES")]
+	[SerializeField]
+	private GameObject redSphere;
 
-        RaycastHit playerHit;
-        if(canFire && Physics.Raycast(cannon.transform.position, cannon.transform.forward, out playerHit, 200))
-        {
-            if(playerHit.transform.CompareTag("Player"))
-            {
-                Fire();
-            }
-        }
-    }
+	[SerializeField]
+	private GameObject body;
 
-    private void IniEnemy()
-    {
-        player = GameObject.FindGameObjectWithTag("Player");
-    }
+	[Header("AUDIO")]
+	[SerializeField]
+	private AudioSource audioSource;
 
-    private void Fire()
-    {
-        GameObject newBullet = Instantiate(bullet, cannon.transform.position, Quaternion.identity);
-        newBullet.GetComponent<Rigidbody>().AddForce(cannon.transform.forward * bulletSpeed);
+	[SerializeField]
+	private AudioClip fireSound;
 
-        audioSource.PlayOneShot(fireSound, 0.2f);
+	private bool dead;
 
-        canFire = false;
-    }
+	private bool canFire;
 
-    private void FireRateControl()
-    {
-        if (!canFire)
-        {
-            timer += Time.deltaTime;
-            if(timer > fireRate)
-            {
-                timer = 0;
-                canFire = true;
-            }
-        }
-    }
+	private GameObject player;
 
-    public void Death()
-    {
-        redSphere.SetActive(false);
-        deathFX.SetActive(true);
-    }
+	private float timer;
+
+	private void Start()
+	{
+		IniEnemy();
+	}
+
+	private void Update()
+	{
+		if (!dead && !GameController.sharedGameController.IsGameOver())
+		{
+			SightControl();
+			FireRateControl();
+		}
+	}
+
+	private void SightControl()
+	{
+		cannon.transform.LookAt(player.transform);
+		Vector3 direction = Camera.main.transform.position - cannonEnd.transform.position;
+		if (canFire && Physics.Raycast(cannonEnd.transform.position, direction, out var hitInfo, 200f) && hitInfo.transform.CompareTag("Player"))
+		{
+			Fire();
+		}
+	}
+
+	private void IniEnemy()
+	{
+		player = GameObject.FindGameObjectWithTag("Player");
+		canFire = true;
+	}
+
+	private void Fire()
+	{
+		Object.Instantiate(bullet, cannonEnd.transform.position, Quaternion.identity).GetComponent<Rigidbody>().AddForce(cannon.transform.forward * bulletSpeed);
+		audioSource.PlayOneShot(fireSound, 0.8f);
+		canFire = false;
+	}
+
+	private void FireRateControl()
+	{
+		if (!canFire)
+		{
+			timer += Time.deltaTime;
+			if (timer > fireRate)
+			{
+				timer = 0f;
+				canFire = true;
+			}
+		}
+	}
+
+	public void Death()
+	{
+		redSphere.SetActive(value: false);
+		deathFX.SetActive(value: true);
+		cannon.SetActive(value: false);
+		dead = true;
+		collider.enabled = false;
+	}
 }

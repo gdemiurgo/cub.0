@@ -1,124 +1,181 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class StartCube : MonoBehaviour
 {
-    [SerializeField] private GameObject capsuleObj;
+	[SerializeField]
+	private GameObject capsuleObj;
 
-    [Header("SCREEN UI")]
-    [SerializeField] private GameObject screenLocks1;
-    [SerializeField] private GameObject screenLocks2;
-    [SerializeField] private GameObject screenLocks3;
+	[Header("SCREEN UI")]
+	[SerializeField]
+	private GameObject screenLocks1;
 
-    [Header("1 LOCK")]
-    [SerializeField] private GameObject locks1Locked1;
-    [SerializeField] private GameObject locks1Unlocked1;
-    [Header("2 LOCKS")]
-    [SerializeField] private GameObject locks2Locked1;
-    [SerializeField] private GameObject locks2Locked2;
-    [SerializeField] private GameObject locks2Unlocked1;
-    [SerializeField] private GameObject locks2Unlocked2;
-    [Header("3 LOCKS")]
-    [SerializeField] private GameObject locks3Locked1;
-    [SerializeField] private GameObject locks3Locked2;
-    [SerializeField] private GameObject locks3Locked3;
-    [SerializeField] private GameObject locks3Unlocked1;
-    [SerializeField] private GameObject locks3Unlocked2;
-    [SerializeField] private GameObject locks3Unlocked3;
+	[SerializeField]
+	private GameObject screenLocks2;
 
-    [Header("AUDIO")]
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip openDoorSound;
-    [SerializeField] private AudioClip closedDoorSound;
+	[SerializeField]
+	private GameObject screenLocks3;
 
-    Animator capsuleAnim;
-    bool opened;
+	[Header("1 LOCK")]
+	[SerializeField]
+	private GameObject locks1Locked1;
 
-    void Start()
-    {
-        capsuleAnim = capsuleObj.GetComponent<Animator>();
-    }
+	[SerializeField]
+	private GameObject locks1Unlocked1;
 
-    void Update()
-    {
-        
-    }
+	[Header("2 LOCKS")]
+	[SerializeField]
+	private GameObject locks2Locked1;
 
-    public void OpenCapsule()
-    {
-        capsuleAnim.SetBool("Opened", true);
+	[SerializeField]
+	private GameObject locks2Locked2;
 
-        audioSource.PlayOneShot(openDoorSound, 0.2f);
-    }
+	[SerializeField]
+	private GameObject locks2Unlocked1;
 
-    public void CloseCapsule()
-    {
-        capsuleAnim.SetBool("Opened", false);
+	[SerializeField]
+	private GameObject locks2Unlocked2;
 
-        audioSource.PlayOneShot(openDoorSound, 0.2f);
-    }
+	[Header("3 LOCKS")]
+	[SerializeField]
+	private GameObject locks3Locked1;
 
-    public void SetScreenUI(bool unlocked1, bool unlocked2, bool unlocked3)
-    {
-        locks1Locked1.SetActive(!unlocked1);
-        locks1Unlocked1.SetActive(unlocked1);
+	[SerializeField]
+	private GameObject locks3Locked2;
 
-        locks2Locked1.SetActive(!unlocked1);
-        locks2Locked2.SetActive(!unlocked2);
-        locks2Unlocked1.SetActive(unlocked1);
-        locks2Unlocked2.SetActive(unlocked2);
+	[SerializeField]
+	private GameObject locks3Locked3;
 
-        locks3Locked1.SetActive(!unlocked1);
-        locks3Locked2.SetActive(!unlocked2);
-        locks3Locked3.SetActive(!unlocked3);
-        locks3Unlocked1.SetActive(unlocked1);
-        locks3Unlocked2.SetActive(unlocked2);
-        locks3Unlocked3.SetActive(unlocked3);
-    }
+	[SerializeField]
+	private GameObject locks3Unlocked1;
 
-    private void IniStartCube()
-    {
-        capsuleAnim = capsuleObj.GetComponent<Animator>();
+	[SerializeField]
+	private GameObject locks3Unlocked2;
 
-        ResetScreen();
-        SetScreenUI(false, false, false);
-    }
+	[SerializeField]
+	private GameObject locks3Unlocked3;
 
-    private void ResetScreen()
-    {
-        switch (GameController.sharedGameController.LocksNumber())
-        {
-            case 1:
-                screenLocks1.SetActive(true);
-                screenLocks2.SetActive(false);
-                screenLocks3.SetActive(false);
-                break;
-            case 2:
-                screenLocks1.SetActive(false);
-                screenLocks2.SetActive(true);
-                screenLocks3.SetActive(false);
-                break;
-            case 3:
-                screenLocks1.SetActive(false);
-                screenLocks2.SetActive(false);
-                screenLocks3.SetActive(true);
-                break;
-        }
-    }
+	[Header("AUDIO")]
+	[SerializeField]
+	private AudioSource audioSource;
 
-    //CALLED FROM ANIMATION EVENT
-    private void DoorClosed()
-    {
-        audioSource.PlayOneShot(closedDoorSound, 0.2f);
-    }
+	[SerializeField]
+	private AudioClip openDoorSound;
 
-    private void OnTriggerExit(Collider other)
-    {
-        if(other.tag == "Player")
-        {
-            CloseCapsule();
-            GameController.sharedGameController.SetStartCapsuleClosed(true);
-        }
-    }
+	[SerializeField]
+	private AudioClip closedDoorSound;
+
+	[Header("ANIMATION")]
+	[SerializeField]
+	private Animator capsuleAnim;
+
+	private bool opened;
+
+	public bool doorClosed;
+
+	private void Start()
+	{
+		IniStartCube();
+	}
+
+	private void Update()
+	{
+	}
+
+	public void OpenCapsule()
+	{
+		if (!opened)
+		{
+			capsuleAnim.SetBool("Opened", value: true);
+			audioSource.PlayOneShot(openDoorSound, 0.02f);
+			opened = true;
+			if (GameController.sharedGameController.AllUnlocked())
+			{
+				doorClosed = false;
+			}
+		}
+	}
+
+	public void CloseCapsule()
+	{
+		if (opened)
+		{
+			capsuleAnim.SetBool("Opened", value: false);
+			audioSource.PlayOneShot(openDoorSound, 0.03f);
+			opened = false;
+		}
+	}
+
+	public bool Opened()
+	{
+		return opened;
+	}
+
+	public void SetScreenUI(bool unlocked1, bool unlocked2, bool unlocked3)
+	{
+		locks1Locked1.SetActive(!unlocked1);
+		locks1Unlocked1.SetActive(unlocked1);
+		locks2Locked1.SetActive(!unlocked1);
+		locks2Locked2.SetActive(!unlocked2);
+		locks2Unlocked1.SetActive(unlocked1);
+		locks2Unlocked2.SetActive(unlocked2);
+		locks3Locked1.SetActive(!unlocked1);
+		locks3Locked2.SetActive(!unlocked2);
+		locks3Locked3.SetActive(!unlocked3);
+		locks3Unlocked1.SetActive(unlocked1);
+		locks3Unlocked2.SetActive(unlocked2);
+		locks3Unlocked3.SetActive(unlocked3);
+	}
+
+	private void IniStartCube()
+	{
+		capsuleAnim = capsuleObj.GetComponent<Animator>();
+		ResetScreen();
+		SetScreenUI(unlocked1: false, unlocked2: false, unlocked3: false);
+		doorClosed = true;
+	}
+
+	private void ResetScreen()
+	{
+		switch (GameController.sharedGameController.LocksNumber())
+		{
+		case 1:
+			screenLocks1.SetActive(value: true);
+			screenLocks2.SetActive(value: false);
+			screenLocks3.SetActive(value: false);
+			break;
+		case 2:
+			screenLocks1.SetActive(value: false);
+			screenLocks2.SetActive(value: true);
+			screenLocks3.SetActive(value: false);
+			break;
+		case 3:
+			screenLocks1.SetActive(value: false);
+			screenLocks2.SetActive(value: false);
+			screenLocks3.SetActive(value: true);
+			break;
+		}
+	}
+
+	public void DoorClosed()
+	{
+		if (!GameController.sharedGameController.IsGameOver())
+		{
+			audioSource.PlayOneShot(closedDoorSound, 0.04f);
+		}
+		doorClosed = true;
+	}
+
+	public bool IsDoorClosed()
+	{
+		return doorClosed;
+	}
+
+	private void OnTriggerExit(Collider other)
+	{
+		if (opened && other.tag == "Player")
+		{
+			CloseCapsule();
+			GameController.sharedGameController.SetStartCapsuleClosed(startCapsuleClosed: true);
+		}
+	}
 }

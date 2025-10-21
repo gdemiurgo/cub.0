@@ -1,71 +1,79 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class LockCube : MonoBehaviour
 {
-    [SerializeField] private int lockNumber = 1;
+	[SerializeField]
+	private int lockNumber = 1;
 
-    [Header("SCREEN UI")]
-    [SerializeField] private GameObject screenLocked;
-    [SerializeField] private GameObject screenUnlocked;
-    [SerializeField] private TextMesh lockNumberText;
+	[Header("SCREEN UI")]
+	[SerializeField]
+	private GameObject screenLocked;
 
-    [Header("AUDIO")]
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip errorSound;
-    [SerializeField] private AudioClip unlockedSound;
+	[SerializeField]
+	private GameObject screenUnlocked;
 
-    private bool canUnlock, unlocked;
+	[SerializeField]
+	private TextMesh lockNumberText;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        IniLock();
-    }
+	[Header("AUDIO")]
+	[SerializeField]
+	private AudioSource audioSource;
 
-    private void IniLock()
-    {
-        lockNumberText.text = lockNumber.ToString();
-        unlocked = false;
-        screenLocked.SetActive(true);
-        screenUnlocked.SetActive(false);
-    }
+	[SerializeField]
+	private AudioClip errorSound;
 
-    private void OnMouseDown()
-    {
-        if (canUnlock)
-        {
-            if (!unlocked)
-            {
-                GameController.sharedGameController.Unlock(lockNumber);
-                unlocked = true;
-                screenLocked.SetActive(false);
-                screenUnlocked.SetActive(true);
+	[SerializeField]
+	private AudioClip unlockedSound;
 
-                audioSource.PlayOneShot(unlockedSound, 0.2f);
-            }
-            else
-            {
-                audioSource.PlayOneShot(errorSound, 0.2f);
-            }
-        }
-    }
+	private bool canUnlock;
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if(other.CompareTag("Player"))
-        {
-            canUnlock = true;
-        }
-    }
+	private bool unlocked;
 
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            canUnlock = false;
-        }
-    }
+	private void Start()
+	{
+		IniLock();
+	}
+
+	private void IniLock()
+	{
+		lockNumberText.text = lockNumber.ToString();
+		unlocked = false;
+		screenLocked.SetActive(value: true);
+		screenUnlocked.SetActive(value: false);
+	}
+
+	private void OnMouseDown()
+	{
+		if (canUnlock)
+		{
+			if (!unlocked && (lockNumber == 1 || (lockNumber == 2 && GameController.sharedGameController.unlocked1) || (lockNumber == 3 && GameController.sharedGameController.unlocked1 && GameController.sharedGameController.unlocked2)))
+			{
+				GameController.sharedGameController.Unlock(lockNumber);
+				unlocked = true;
+				screenLocked.SetActive(value: false);
+				screenUnlocked.SetActive(value: true);
+				audioSource.PlayOneShot(unlockedSound, 0.2f);
+			}
+			else
+			{
+				audioSource.PlayOneShot(errorSound, 0.2f);
+			}
+		}
+	}
+
+	private void OnTriggerEnter(Collider other)
+	{
+		if (other.CompareTag("Player"))
+		{
+			canUnlock = true;
+		}
+	}
+
+	private void OnTriggerExit(Collider other)
+	{
+		if (other.CompareTag("Player"))
+		{
+			canUnlock = false;
+		}
+	}
 }

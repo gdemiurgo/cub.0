@@ -1,261 +1,325 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityStandardAssets.Characters.FirstPerson;
 
 public class GameController : MonoBehaviour
 {
-    public static GameController sharedGameController;
+	public static GameController sharedGameController;
 
-    [SerializeField] private int locksNumber;
-    [SerializeField] private bool unlocked1, unlocked2, unlocked3;
+	[SerializeField]
+	private int locksNumber;
 
-    [SerializeField] private bool enableGravityMode = true;
-    [SerializeField] private bool enableFire = true;
-    [SerializeField] private float letterPause = 0.2f;
-    [SerializeField] private Color[] crossHairColors;
+	public bool unlocked1;
 
-    GameObject crossHair;
-    GameObject playerObj;
-    GameObject startCube;
-    GameObject blackBack;
-    GameObject sceneTittleObj;
-    GameObject capsuleSceneTextObj;
-    GameObject playerIniTextObj;
-    Text sceneTittleText;
-    TextMesh capsuleSceneText;
-    Text playerIniText;
-    string iniMessage;
-    bool gameOver;
-    bool startedGame;
-    bool tittleIni;
-    bool startCapsuleClosed;
-    bool allUnlocked;
-    StartCube startCubeController;
-    PlayerController playerController;
-    CanvasGroup blackCanvasGroup;
-    Image crossHairImage;
-    private int unlockedCount;
+	public bool unlocked2;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        sharedGameController = this;
+	public bool unlocked3;
 
-        playerObj = GameObject.FindGameObjectWithTag("Player");
-        playerController = playerObj.GetComponent<PlayerController>();
-        crossHair = GameObject.FindGameObjectWithTag("CrossHair");
-        crossHairImage = crossHair.GetComponent<Image>();
+	[SerializeField]
+	private bool enableGravityMode = true;
 
-        playerController.Deactivate();
+	[SerializeField]
+	private bool enableFire = true;
 
-        startCube = GameObject.FindGameObjectWithTag("StartCube");
-        startCubeController = startCube.GetComponent<StartCube>();
+    [SerializeField]
+    private float letterPause = 0.03f;
 
-        Cursor.visible = false;
+	[SerializeField]
+	private Color[] crossHairColors;
 
-        SetStartTittle();
-    }
+	private GameObject crossHair;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.R))
-        {
-            Restart();
-        }
+	private GameObject playerObj;
 
-        if(startedGame && !gameOver)
-        {
-            if (blackCanvasGroup.alpha > 0)
-            {
-                blackCanvasGroup.alpha -= 0.1f;
-            }
-        }
+	private GameObject startCube;
 
-        if (gameOver)
-        {
-            if (blackCanvasGroup.alpha < 1)
-            {
-                blackCanvasGroup.alpha += 0.1f;
-            }
-        }
+	private GameObject blackBack;
 
-        if(!tittleIni)
-        {
-            if (Input.anyKeyDown)
-            {
-                tittleIni = true;
-            }
-        }
-        else
-        {
-            if(Input.anyKeyDown)
-            {
-                StartedGame();
-            }
-        }
-    }
+	private GameObject sceneTittleObj;
 
-    void SetStartTittle()
-    {
-        blackBack = GameObject.FindGameObjectWithTag("BlackBack");
-        blackCanvasGroup = blackBack.GetComponent<CanvasGroup>();
-        blackCanvasGroup.alpha = 1;
+	private GameObject capsuleSceneTextObj;
 
-        sceneTittleObj = GameObject.FindGameObjectWithTag("SceneText");
-        sceneTittleObj.SetActive(true);
-        sceneTittleText = sceneTittleObj.GetComponent<Text>();
+	private GameObject playerIniTextObj;
 
-        capsuleSceneTextObj = GameObject.FindGameObjectWithTag("CapsuleSceneText");
-        capsuleSceneText = capsuleSceneTextObj.GetComponent<TextMesh>();
+	private Text sceneTittleText;
 
-        sceneTittleText.text = "C.U.B." + SceneManager.GetActiveScene().buildIndex;
-        capsuleSceneText.text = sceneTittleText.text;
+	private TextMesh capsuleSceneText;
 
-        playerIniTextObj = GameObject.FindGameObjectWithTag("PlayerIniText");
-        playerIniText = playerIniTextObj.GetComponent<Text>();
+	private Text playerIniText;
 
-        iniMessage = playerIniText.text;
-        playerIniText.text = "";
+	private string iniMessage;
 
-        StartCoroutine(TypeIniText());
-    }
+	public bool gameOver;
 
-    public void StartedGame()
-    {
-        if(!startedGame && tittleIni)
-        {
-            startCubeController.OpenCapsule();
+	public bool mainMenu;
 
-            blackCanvasGroup.alpha = 1;
-            sceneTittleObj.SetActive(false);
-            playerIniTextObj.SetActive(false);
+	private bool startedGame;
 
-            playerController.Activate();
+	private bool tittleIni;
 
-            /*if (enableGravityMode)
-            {
-                playerController.GravityControlActivate();
-            }
+	private bool startCapsuleClosed;
 
-            if (enableFire)
-            {
-                playerController.FireActivate();
-            }*/
+	private bool allUnlocked;
 
-            startedGame = true;
-        }
-    }
+	private StartCube startCubeController;
 
-    public void Restart()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
+	private PlayerController playerController;
 
-    public void GameOver(bool restartScene, float restartTime)
-    {
-        gameOver = true;
-        playerController.Deactivate();
+	private CanvasGroup blackCanvasGroup;
 
-        if (restartScene) Invoke("RestartScene", restartTime);
-    }
+	private Image crossHairImage;
 
-    public int LocksNumber()
-    {
-        return locksNumber;
-    }
+	private int unlockedCount;
 
-    public void EnableCrossHair()
-    {
-        crossHairImage.color = crossHairColors[0];
-        //crossHair.SetActive(true);
-    }
+	private void Awake()
+	{
+		sharedGameController = this;
+	}
 
-    public void DisableCrossHair()
-    {
-        crossHairImage.color = crossHairColors[1];
-        //crossHair.SetActive(false);
-    }
+	private void Start()
+	{
+		playerObj = GameObject.FindGameObjectWithTag("Player");
+		playerController = playerObj.GetComponent<PlayerController>();
+		crossHair = GameObject.FindGameObjectWithTag("CrossHair");
+		crossHairImage = crossHair.GetComponent<Image>();
+		playerController.Deactivate();
+		startCube = GameObject.FindGameObjectWithTag("StartCube");
+		startCubeController = startCube.GetComponent<StartCube>();
+		Cursor.visible = false;
+		SetStartTittle();
+	}
 
-    public void SetStartCapsuleClosed(bool startCapsuleClosed)
-    {
-        this.startCapsuleClosed = startCapsuleClosed;
+	private void Update()
+	{
+		if (startedGame && !gameOver && blackCanvasGroup.alpha > 0f)
+		{
+			blackCanvasGroup.alpha -= 0.1f;
+		}
+		if (gameOver && blackCanvasGroup.alpha < 1f)
+		{
+			if (!mainMenu)
+			{
+				blackCanvasGroup.alpha += 0.1f;
+			}
+			else
+			{
+				blackCanvasGroup.alpha += 0.005f;
+			}
+		}
+		if (!tittleIni)
+		{
+			if (Input.anyKeyDown)
+			{
+				tittleIni = true;
+			}
+		}
+		else if (Input.anyKeyDown)
+		{
+			StartedGame();
+		}
+	}
 
-        if (enableGravityMode)
-        {
-            playerController.GravityControlActivate();
-        }
+	private void SetStartTittle()
+	{
+		AudioController.instance.StartSound();
+		blackBack = GameObject.FindGameObjectWithTag("BlackBack");
+		blackCanvasGroup = blackBack.GetComponent<CanvasGroup>();
+		blackCanvasGroup.alpha = 1f;
+		sceneTittleObj = GameObject.FindGameObjectWithTag("SceneText");
+		sceneTittleObj.SetActive(value: true);
+		sceneTittleText = sceneTittleObj.GetComponent<Text>();
+		capsuleSceneTextObj = GameObject.FindGameObjectWithTag("CapsuleSceneText");
+		capsuleSceneText = capsuleSceneTextObj.GetComponent<TextMesh>();
+		sceneTittleText.text = "CUB." + SceneManager.GetActiveScene().buildIndex;
+		capsuleSceneText.text = sceneTittleText.text;
+		playerIniTextObj = GameObject.FindGameObjectWithTag("PlayerIniText");
+		playerIniText = playerIniTextObj.GetComponent<Text>();
+		iniMessage = playerIniText.text;
+		playerIniText.text = "";
+		StartCoroutine(TypeIniText());
+	}
 
-        if (enableFire)
-        {
-            playerController.FireActivate();
-        }
-    }
+	public void StartedGame()
+	{
+		if (!startedGame && tittleIni)
+		{
+			startCubeController.OpenCapsule();
+			blackCanvasGroup.alpha = 1f;
+			sceneTittleObj.SetActive(value: false);
+			playerIniTextObj.SetActive(value: false);
+			playerController.Activate();
+			startedGame = true;
+		}
+	}
 
-    public bool GetStartCapsuleClosed()
-    {
-        return startCapsuleClosed;
-    }
+	public void Restart()
+	{
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+	}
 
-    //LOCKS
+	public void GameOver(bool restartScene, float restartTime)
+	{
+		if (gameOver)
+		{
+			return;
+		}
+		if (!mainMenu)
+		{
+			playerController.Deactivate();
+			if (restartScene)
+			{
+				Invoke("RestartScene", restartTime);
+				GameManager.instance.NewClone();
+			}
+			else
+			{
+				Invoke("NextScene", restartTime);
+			}
+		}
+		else
+		{
+			Invoke("GoToMainMenu", restartTime);
+		}
+		gameOver = true;
+	}
 
-    public void Unlock(int lockNumber)
-    {
-        switch(lockNumber)
-        {
-            case 1:
-                unlocked1 = true;
-                break;
-            case 2:
-                unlocked2 = true;
-                break;
-            case 3:
-                unlocked3 = true;
-                break;
-        }
+	public void MainMenu()
+	{
+		RigidbodyFirstPersonController component = playerObj.GetComponent<RigidbodyFirstPersonController>();
+		component.movementSettings.ForwardSpeed = 0f;
+		component.movementSettings.BackwardSpeed = 0f;
+		component.movementSettings.StrafeSpeed = 0f;
+		component.movementSettings.JumpForce = 0f;
+		mainMenu = true;
+	}
 
-        startCubeController.SetScreenUI(unlocked1, unlocked2, unlocked3);
+	public void GoToMainMenu()
+	{
+		Object.Destroy(GameManager.instance);
+		SceneManager.LoadScene(0);
+	}
 
-        unlockedCount++;
-        CheckAllUnlocked();
-    }
+	public bool IsGameOver()
+	{
+		return gameOver;
+	}
 
-    public void CheckAllUnlocked()
-    {
-        if(unlockedCount == locksNumber)
-        {
-            allUnlocked = true;
-        }
-    }
+	public int LocksNumber()
+	{
+		return locksNumber;
+	}
 
-    public bool AllUnlocked()
-    {
-        return allUnlocked;
-    }
+	public void EnableCrossHair()
+	{
+		crossHairImage.color = crossHairColors[0];
+	}
 
-    private void RestartScene()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
+	public void DisableCrossHair()
+	{
+		crossHairImage.color = crossHairColors[1];
+	}
 
-    private IEnumerator TypeIniText()
-    {
-        foreach (char letter in iniMessage.ToCharArray())
-        {
-            if(!tittleIni)
-            {
-                playerIniText.text += letter;
-                yield return 0;
-                yield return new WaitForSeconds(letterPause);
-            }
-            else
-            {
-                playerIniText.text = iniMessage;
-                break;
-            }
-        }
-        tittleIni = true;
-    }
+	public void SetStartCapsuleClosed(bool startCapsuleClosed)
+	{
+		this.startCapsuleClosed = startCapsuleClosed;
+		if (enableGravityMode)
+		{
+			playerController.GravityControlActivate();
+		}
+		if (enableFire)
+		{
+			playerController.FireActivate();
+		}
+	}
+
+	public bool GetStartCapsuleClosed()
+	{
+		return startCapsuleClosed;
+	}
+
+	public void Unlock(int lockNumber)
+	{
+		switch (lockNumber)
+		{
+		case 1:
+			unlocked1 = true;
+			break;
+		case 2:
+			unlocked2 = true;
+			break;
+		case 3:
+			unlocked3 = true;
+			break;
+		}
+		startCubeController.SetScreenUI(unlocked1, unlocked2, unlocked3);
+		unlockedCount++;
+		CheckAllUnlocked();
+	}
+
+	public void CheckAllUnlocked()
+	{
+		if (unlockedCount == locksNumber)
+		{
+			allUnlocked = true;
+		}
+	}
+
+	public bool AllUnlocked()
+	{
+		return allUnlocked;
+	}
+
+	public bool GravityEnabled()
+	{
+		return enableGravityMode;
+	}
+
+	public void TheManShooted()
+	{
+		playerIniText.text = "[ mouse . 2 ]   gun . disabled";
+		RectTransform component = playerIniTextObj.GetComponent<RectTransform>();
+		component.anchoredPosition = new Vector2(component.anchoredPosition.x, 50f);
+		playerIniTextObj.SetActive(value: true);
+		Invoke("DisableIniText", 5f);
+	}
+
+	private void DisableIniText()
+	{
+		playerIniTextObj.SetActive(value: false);
+	}
+
+	private void RestartScene()
+	{
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+	}
+
+	private void NextScene()
+	{
+		SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+	}
+
+	private IEnumerator TypeIniText()
+	{
+		char[] array = iniMessage.ToCharArray();
+		foreach (char c in array)
+		{
+			if (!tittleIni)
+			{
+				AudioController.instance.TypeSound();
+				playerIniText.text += c;
+				yield return 0;
+				yield return new WaitForSeconds(letterPause);
+				continue;
+			}
+			playerIniText.text = iniMessage;
+			break;
+		}
+		if (iniMessage != "")
+		{
+			AudioController.instance.EndTypeSound();
+		}
+		tittleIni = true;
+	}
 }

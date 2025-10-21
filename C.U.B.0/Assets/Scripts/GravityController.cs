@@ -1,212 +1,178 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GravityController : MonoBehaviour
 {
-    [SerializeField]
-    private float speed;
-    [SerializeField]
-    private GameObject spawnPosCam;
-    [SerializeField]
-    private bool activated;
-    [SerializeField] private GameObject gravityObj;
+	[SerializeField]
+	private float speed;
 
-    GameObject sceneObj;
-    GameObject sceneRotator;
-    GameObject gravitySelectorObj;
-    Transform target;
-    Vector3 rotTarget;
-    bool canRotate = true;
-    bool rotating;
-    bool hitCeiling;
-    int rotUpDir;
-    bool gravityMode;
-    int gravityLayer;
-    Camera camera;
-    float camLerpTime;
-    float iniFov;
+	[SerializeField]
+	private GameObject spawnPosCam;
 
-    bool changeFov;
-    bool fovDown;
+	[SerializeField]
+	private bool activated;
 
-    private Vector3 velocity = Vector3.zero;
+	[SerializeField]
+	private AudioSource weaponAudioSource;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        sceneObj = GameObject.FindGameObjectWithTag("SceneObj");
-        sceneRotator = GameObject.FindGameObjectWithTag("SceneRotator");
-        gravityLayer = LayerMask.GetMask("GravityLayer");
-        target = GameObject.FindGameObjectWithTag("GameController").transform;
-        gravitySelectorObj = GameObject.FindGameObjectWithTag("GravitySelector");
-        gravitySelectorObj.SetActive(false);
+	[SerializeField]
+	private AudioClip gGunSound;
 
-        camera = spawnPosCam.GetComponent<Camera>();
-        iniFov = camera.fieldOfView;
-    }
+	private GameObject sceneObj;
 
-    // Update is called once per frame
-    void Update()
-    {
-        // Control de "Cambio de gravedad"
-        // Lanzamos un rayo en la direccion que mira el player y obtenemos la normal de la pared que toca. 
-        // Seria la direccion que tendria el eje "Y" del player(hacia donde apuntaria la cabeza si se pusiese de pie en esa pared)
+	private GameObject sceneRotator;
 
-        if(activated && GameController.sharedGameController.GetStartCapsuleClosed())
-        {
-            RaycastHit gravityHit;
-            if (Physics.Raycast(spawnPosCam.transform.position, spawnPosCam.transform.forward, out gravityHit, 100) && canRotate)
-            {
-                if(gravityHit.transform.tag == "GWall")
-                {
-                    if (Vector3.up != gravityHit.normal)
-                    {
-                        // Si pulsamos el boton derecho del raton habilitamos el modo "cambio de gravedad"
-                        if (Input.GetKey(KeyCode.Mouse1))
-                        {
-                            rotTarget = gravityHit.normal;
+	private GameObject gravitySelectorObj;
 
-                            float dirAngle = Vector3.Angle(transform.up, rotTarget);
-                            if (dirAngle > 100)
-                            {
-                                float playerForwardAngle = Vector3.Angle(transform.forward, GameController.sharedGameController.transform.forward);
+	private Transform target;
 
-                                if(playerForwardAngle > 91)
-                                {
-                                    target.eulerAngles = new Vector3(0, 0, 0);
-                                }
-                                else
-                                {
-                                    target.eulerAngles = new Vector3(0, 360, 0);
-                                }
-                            }
+	private Vector3 rotTarget;
 
-                            SetRot();
-                            canRotate = false;
-                            changeFov = true;
-                        }
-                    }
+	private bool canRotate = true;
 
-                    // Habilitamos el selector de gravedad si apuntamos a una pared que permita cambiar la gravedad
-                    gravitySelectorObj.SetActive(true);
-                }
-                else
-                {
-                    gravitySelectorObj.SetActive(false);
-                }
-            }
-            else
-            {
-                gravitySelectorObj.SetActive(false);
-            }
-        }
-        else
-        {
-            gravitySelectorObj.SetActive(false);
-        }
+	private bool rotating;
 
-        // Rotamos el objeto padre que hemos asignado al escenario hasta alinear su eje Y con el del player
-        if (rotating)
-        {
-            Rotate();
-        }
+	private bool hitCeiling;
 
-        if(changeFov)
-        {
-            ChangeFov();
-        }
-    }
+	private int rotUpDir;
 
-    void ChangeFov()
-    {
-        if(!fovDown)
-        {
-            camLerpTime += 0.08f;
+	private bool gravityMode;
 
-            if (camLerpTime >= 1)
-            {
-                fovDown = true;
-            }
-        }
-        else
-        {
-            camLerpTime -= 0.08f;
+	private int gravityLayer;
 
-            if (camLerpTime <= 0)
-            {
-                changeFov = false;
-                fovDown = false;
-            }
-        }
+	private Camera camera;
 
-        camera.fieldOfView = Mathf.Lerp(iniFov, iniFov + 2, camLerpTime);
-        Time.timeScale = Mathf.Lerp(1, 0.8f, camLerpTime);
-    }
+	private float camLerpTime;
 
-    void Rotate()
-    {
-        //float step = speed * Time.deltaTime;
+	private float iniFov;
 
-        // Rotamos
-        //sceneRotator.transform.rotation = Quaternion.RotateTowards(sceneRotator.transform.rotation, target.rotation, step);
+	private bool changeFov;
 
-        //sceneRotator.transform.rotation = Quaternion.Slerp(sceneRotator.transform.rotation, target.rotation, 0.12f);
+	private bool fovDown;
 
-        /*float angle = Vector3.Angle(sceneRotator.transform.up, target.transform.up);
-        if(angle < 0.1f)
-        {
-            sceneRotator.transform.up = target.transform.up;
-        }
+	private Vector3 velocity = Vector3.zero;
 
-        if (sceneRotator.transform.up == target.transform.up)
-        {
-            ResetRot();
-            rotating = false;
-            Debug.Log("MISMA ROTACION");
-        }*/
+	private void Start()
+	{
+		sceneObj = GameObject.FindGameObjectWithTag("SceneObj");
+		sceneRotator = GameObject.FindGameObjectWithTag("SceneRotator");
+		gravityLayer = LayerMask.GetMask("GravityLayer");
+		target = GameObject.FindGameObjectWithTag("GameController").transform;
+		gravitySelectorObj = GameObject.FindGameObjectWithTag("GravitySelector");
+		gravitySelectorObj.SetActive(value: false);
+		camera = spawnPosCam.GetComponent<Camera>();
+		iniFov = camera.fieldOfView;
+	}
 
-        //NEW WAY
-        gravityObj.transform.rotation = Quaternion.Slerp(gravityObj.transform.rotation, target.rotation, 0.12f);
+	private void Update()
+	{
+		if (activated && GameController.sharedGameController.GetStartCapsuleClosed())
+		{
+			if (Physics.Raycast(spawnPosCam.transform.position, spawnPosCam.transform.forward, out var hitInfo, 100f) && canRotate)
+			{
+				if (hitInfo.transform.tag == "GWall")
+				{
+					if (Vector3.up != hitInfo.normal && Input.GetKey(KeyCode.Mouse0))
+					{
+						weaponAudioSource.pitch = 0.9f;
+						weaponAudioSource.PlayOneShot(gGunSound, 0.15f);
+						rotTarget = hitInfo.normal;
+						if (Vector3.Angle(base.transform.up, rotTarget) > 100f)
+						{
+							if (Vector3.Angle(base.transform.forward, GameController.sharedGameController.transform.forward) > 91f)
+							{
+								target.eulerAngles = new Vector3(0f, 0f, 0f);
+							}
+							else
+							{
+								target.eulerAngles = new Vector3(0f, 360f, 0f);
+							}
+						}
+						SetRot();
+						canRotate = false;
+						changeFov = true;
+					}
+					gravitySelectorObj.SetActive(value: true);
+				}
+				else
+				{
+					gravitySelectorObj.SetActive(value: false);
+				}
+			}
+			else
+			{
+				gravitySelectorObj.SetActive(value: false);
+			}
+		}
+		else
+		{
+			gravitySelectorObj.SetActive(value: false);
+		}
+		if (rotating)
+		{
+			Rotate();
+		}
+		if (changeFov)
+		{
+			ChangeFov();
+		}
+	}
 
-        Physics.gravity = gravityObj.transform.eulerAngles;
+	private void ChangeFov()
+	{
+		if (!fovDown)
+		{
+			camLerpTime += 0.08f;
+			if (camLerpTime >= 1f)
+			{
+				fovDown = true;
+			}
+		}
+		else
+		{
+			camLerpTime -= 0.08f;
+			if (camLerpTime <= 0f)
+			{
+				changeFov = false;
+				fovDown = false;
+			}
+		}
+		camera.fieldOfView = Mathf.Lerp(iniFov, iniFov + 2f, camLerpTime);
+		Time.timeScale = Mathf.Lerp(1f, 0.8f, camLerpTime);
+	}
 
-        float angle = Vector3.Angle(gravityObj.transform.up, target.transform.up);
-        if (angle < 0.1f)
-        {
-            gravityObj.transform.up = target.transform.up;
-        }
+	private void Rotate()
+	{
+		_ = speed;
+		_ = Time.deltaTime;
+		sceneRotator.transform.rotation = Quaternion.Slerp(sceneRotator.transform.rotation, target.rotation, 0.12f);
+		if (Vector3.Angle(sceneRotator.transform.up, target.transform.up) < 0.1f)
+		{
+			sceneRotator.transform.up = target.transform.up;
+		}
+		if (sceneRotator.transform.up == target.transform.up)
+		{
+			ResetRot();
+			rotating = false;
+			Debug.Log("MISMA ROTACION");
+		}
+	}
 
-        if (gravityObj.transform.up == target.transform.up)
-        {
-            rotating = false;
-        }
-    }
+	private void SetRot()
+	{
+		sceneRotator.transform.position = base.transform.position;
+		sceneRotator.transform.rotation = Quaternion.FromToRotation(Vector3.up, rotTarget);
+		sceneObj.transform.SetParent(sceneRotator.transform);
+		rotating = true;
+	}
 
-    void SetRot()
-    {
-        // Colocamos un objeto vacio en la posicion del player
-        // Lo rotamos alineando su eje "Y" con el de la normal de la pared obtenida antes
-        // Hacemos que ese objeto sea padre del escenario para poder rotarlo en la direccion deseada y usando como pivote
-        // de rotacion la posicion del player, asi parece que el que gira es en realidad el jugador
+	private void ResetRot()
+	{
+		sceneObj.transform.parent = null;
+		canRotate = true;
+	}
 
-        /*sceneRotator.transform.position = transform.position;
-        sceneRotator.transform.rotation = Quaternion.FromToRotation(Vector3.up, rotTarget);
-        sceneObj.transform.SetParent(sceneRotator.transform);*/
-
-        //NEW WAY
-        rotating = true;
-    }
-
-    void ResetRot()
-    {
-        // Hacemos que el objeto que rota ya no sea padre del escenario
-        sceneObj.transform.parent = null;
-        canRotate = true;
-    }
-
-    public void SetActivated(bool activated)
-    {
-        this.activated = activated;
-    }
+	public void SetActivated(bool activated)
+	{
+		this.activated = activated;
+	}
 }
