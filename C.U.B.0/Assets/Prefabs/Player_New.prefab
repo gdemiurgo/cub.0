@@ -226,7 +226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b46144f2bb5832b26429c4f49acd800, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 200
+  speed: 0.04
   spawnPosCam: {fileID: 8635775700178086648}
   activated: 0
   weaponAudioSource: {fileID: 8635775700178083997}
@@ -251,8 +251,9 @@ MonoBehaviour:
   bullets: 50
   totalBullets: 50
   shootRate: 0.2
-  shotEffect: {fileID: 0}
-  bulletColEffect: {fileID: 0}
+  shotEffect: {fileID: 1938978788513046, guid: a88f0a7aff1c99642931b974ba0adfe3, type: 3}
+  bulletColEffect: {fileID: 1464829361128306, guid: a39e62464d49bb44787cc13d2995132b,
+    type: 3}
   damagePoints: 0
   deathFallSpeedLimit: 13
   stepsAudioSource: {fileID: 8635775700178083996}

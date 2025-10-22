@@ -276,6 +276,7 @@ GameObject:
   - component: {fileID: 42}
   - component: {fileID: 55}
   - component: {fileID: 23}
+  - component: {fileID: 27}
   m_Layer: 5
   m_Name: CUBO_Tittle
   m_TagString: SceneText
@@ -468,6 +469,25 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &27
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 15}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9284be67cb4e14469d163dfeadbd227, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minX: 5.8
+  maxX: 6.5
+  minY: -1.28
+  maxY: -1
+  minAlpha: 0.25
+  maxAlpha: 0.3
+  pulseSpeed: 2
 --- !u!81 &30
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1181,6 +1201,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa3f1a2d47bf9479853f992a9cd99dc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  testing: 1
 --- !u!114 &54
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1215,11 +1236,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 31b5d98d0957c7b4cb02bd2a65fe6bfc, type: 3}
-    m_FontSize: 120
+    m_FontSize: 135
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 1
-    m_MaxSize: 120
+    m_MaxSize: 135
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1

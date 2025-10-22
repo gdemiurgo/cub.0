@@ -3,7 +3,7 @@ using UnityEngine;
 public class GravityController : MonoBehaviour
 {
 	[SerializeField]
-	private float speed;
+	private float speed = 0.04f;
 
 	[SerializeField]
 	private GameObject spawnPosCam;
@@ -71,7 +71,7 @@ public class GravityController : MonoBehaviour
 			{
 				if (hitInfo.transform.tag == "GWall")
 				{
-					if (Vector3.up != hitInfo.normal && Input.GetKey(KeyCode.Mouse0))
+					if (Vector3.up != hitInfo.normal && Input.GetKeyDown(KeyCode.Mouse0))
 					{
 						weaponAudioSource.pitch = 0.9f;
 						weaponAudioSource.PlayOneShot(gGunSound, 0.15f);
@@ -107,6 +107,7 @@ public class GravityController : MonoBehaviour
 		{
 			gravitySelectorObj.SetActive(value: false);
 		}
+
 		if (rotating)
 		{
 			Rotate();
@@ -142,9 +143,9 @@ public class GravityController : MonoBehaviour
 
 	private void Rotate()
 	{
-		_ = speed;
-		_ = Time.deltaTime;
-		sceneRotator.transform.rotation = Quaternion.Slerp(sceneRotator.transform.rotation, target.rotation, 0.12f);
+		//_ = speed;
+		//_ = Time.deltaTime;
+		sceneRotator.transform.rotation = Quaternion.Slerp(sceneRotator.transform.rotation, target.rotation, speed);
 		if (Vector3.Angle(sceneRotator.transform.up, target.transform.up) < 0.1f)
 		{
 			sceneRotator.transform.up = target.transform.up;

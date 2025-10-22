@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityStandardAssets.Characters.FirstPerson;
 
@@ -284,8 +285,21 @@ public class PlayerController : MonoBehaviour
 		}
 		if (collision.gameObject.tag == "Floor" && collision.transform.position.y < base.transform.position.y && myRB.velocity.y < -1f)
 		{
-			stepsAudioSource.PlayOneShot(leftStepSound, 0.4f);
-			stepsAudioSource.PlayOneShot(rightStepSound, 0.4f);
-		}
+            StartCoroutine(PlayLandingSteps());
+        }
 	}
+
+    private IEnumerator PlayLandingSteps()
+    {
+        // Reproduce el primer pie (izquierdo)
+        stepsAudioSource.PlayOneShot(leftStepSound, 0.4f);
+
+        // Espera un pequeño tiempo aleatorio entre 0 y 0.1 segundos
+        float delay = Random.Range(0f, 0.02f);
+        yield return new WaitForSeconds(delay);
+
+        // Reproduce el segundo pie (derecho)
+        stepsAudioSource.PlayOneShot(rightStepSound, 0.5f);
+    }
+
 }

@@ -1,7 +1,11 @@
-using UnityEngine;
+﻿using UnityEngine;
+
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+	[SerializeField] private bool testing = false;
+
 	public static GameManager instance;
 
 	private int v1;
@@ -28,6 +32,35 @@ public class GameManager : MonoBehaviour
 
 	private void Update()
 	{
+		if (testing)
+		{
+            int currentIndex = SceneManager.GetActiveScene().buildIndex;
+            int totalScenes = SceneManager.sceneCountInBuildSettings;
+
+            if (Input.GetKeyDown(KeyCode.N))
+            {
+                if (currentIndex < totalScenes - 1)
+                {
+                    SceneManager.LoadScene(currentIndex + 1);
+                }
+                else
+                {
+                    Debug.Log("No hay escena siguiente (ya estás en la última).");
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                if (currentIndex > 0)
+                {
+                    SceneManager.LoadScene(currentIndex - 1);
+                }
+                else
+                {
+                    Debug.Log("No hay escena anterior (ya estás en la primera).");
+                }
+            }
+        }
 	}
 
 	private void IniGame()

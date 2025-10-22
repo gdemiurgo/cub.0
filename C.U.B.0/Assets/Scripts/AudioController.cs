@@ -17,7 +17,7 @@ public class AudioController : MonoBehaviour
 	[SerializeField]
 	private AudioClip startSound;
 
-	private void Awake()
+    private void Awake()
 	{
 		instance = this;
 	}
