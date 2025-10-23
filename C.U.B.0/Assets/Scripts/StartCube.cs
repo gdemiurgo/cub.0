@@ -93,6 +93,8 @@ public class StartCube : MonoBehaviour
 				doorClosed = false;
 			}
 		}
+
+		Debug.Log("Open Capsule");
 	}
 
 	public void CloseCapsule()
