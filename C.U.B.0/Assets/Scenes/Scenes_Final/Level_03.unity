@@ -37897,7 +37897,7 @@ PrefabInstance:
     - target: {fileID: 6348143118250681989, guid: 49278c039030fb24085e076e6526acf2,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 700
+      value: 850
       objectReference: {fileID: 0}
     - target: {fileID: 6348143118250681998, guid: 49278c039030fb24085e076e6526acf2,
         type: 3}
@@ -37912,7 +37912,7 @@ PrefabInstance:
     - target: {fileID: 6348143118250683486, guid: 49278c039030fb24085e076e6526acf2,
         type: 3}
       propertyPath: m_Text
-      value: '[ mouse . 1 ]  gravity_gun . enabled'
+      value: '[  m o u s e  .  1  ]   g r a v i t y _ g u n  .  e n a b l e d'
       objectReference: {fileID: 0}
     - target: {fileID: 6348143118250683486, guid: 49278c039030fb24085e076e6526acf2,
         type: 3}

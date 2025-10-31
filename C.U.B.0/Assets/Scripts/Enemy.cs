@@ -42,7 +42,7 @@ public class Enemy : MonoBehaviour
 	[SerializeField]
 	private AudioClip fireSound;
 
-	private bool dead;
+	public bool dead;
 
 	private bool canFire;
 
@@ -66,7 +66,7 @@ public class Enemy : MonoBehaviour
 
 	private void SightControl()
 	{
-		cannon.transform.LookAt(player.transform);
+		cannon.transform.LookAt(Camera.main.transform);
 		Vector3 direction = Camera.main.transform.position - cannonEnd.transform.position;
 		if (canFire && Physics.Raycast(cannonEnd.transform.position, direction, out var hitInfo, 200f) && hitInfo.transform.CompareTag("Player"))
 		{
@@ -74,7 +74,7 @@ public class Enemy : MonoBehaviour
 		}
 	}
 
-	private void IniEnemy()
+	public void IniEnemy()
 	{
 		player = GameObject.FindGameObjectWithTag("Player");
 		canFire = true;

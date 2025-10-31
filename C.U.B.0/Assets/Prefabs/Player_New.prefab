@@ -425,11 +425,11 @@ MonoBehaviour:
     smoothTime: 18
     lockCursor: 1
   advancedSettings:
-    groundCheckDistance: 0.1
+    groundCheckDistance: 0.11
     stickToGroundHelperDistance: 0.6
     slowDownRate: 0
     airControl: 0
-    shellOffset: 0
+    shellOffset: 0.15
 --- !u!1 &8635775700178086651
 GameObject:
   m_ObjectHideFlags: 0

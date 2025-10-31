@@ -20,6 +20,7 @@ public class EnemyBullet : MonoBehaviour
 	private void OnEnable()
 	{
 		audioSource.clip = moveSound;
+		audioSource.pitch = Random.Range(0.98f, 1.02f);
 		audioSource.Play();
 		Object.Destroy(base.gameObject, 3f);
 	}
@@ -33,7 +34,8 @@ public class EnemyBullet : MonoBehaviour
 		Debug.Log("ME DESTRUYE: " + other.name);
 		Object.Instantiate(impact, base.transform.position, Quaternion.identity);
 		audioSource.Stop();
-		audioSource.PlayOneShot(impactSound, 0.5f);
+        audioSource.pitch = Random.Range(0.98f, 1.02f);
+        audioSource.PlayOneShot(impactSound, 0.5f);
 		body.SetActive(value: false);
 	}
 }
